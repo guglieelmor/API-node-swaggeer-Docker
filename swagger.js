@@ -56,17 +56,27 @@
 
 /**
  * @swagger
- * /v1/delivery:
+ * /v1/delivery/{id}:
  *   get:
- *     summary: Atualizar uma ordem de entrega
- *     tags: [Delivery]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DeliveryGet'
+ *     summary: Obter detalhes de entrega por ID
+ *     tags:
+ *       - Delivery
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID da entrega
  *     responses:
  *       200:
- *         description: Entrega criada com sucesso!
+ *         description: Sucesso ao obter os detalhes da entrega
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DeliveryGet'
+ *       400:
+ *         description: Erro ao obter os detalhes da entrega
+ *       404:
+ *         description: Entrega não encontrada
  */

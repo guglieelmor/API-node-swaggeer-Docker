@@ -41,9 +41,9 @@ app.post('/v1/delivery', authenticateToken, deliveryController.create);
 
 app.get('/v1/delivery/:id', authenticateToken, deliveryController.get);
 
-// app.put('/v1/delivery:id', authenticateToken, deliveryController.put);
+app.put('/v1/delivery/:id', authenticateToken, deliveryController.put);
 
-// app.delete('/v1/delivery:id', authenticateToken, deliveryController.delete);
+app.delete('/v1/delivery/:id', authenticateToken, deliveryController.delete);
 
 app.use('/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

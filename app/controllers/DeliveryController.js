@@ -119,19 +119,18 @@ exports.create = async (req, res) => {
 
 /**
  * @swagger
- * /v1/delivery:
+ * /v1/delivery/{id}:
  *   get:
- *     summary: Consultar uma ordem de entrega
- *     tags: [Delivery]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DeliveryGet'
- *     responses:
- *       200:
- *         description: Entrega criada com sucesso!
+ *     summary: Obter detalhes de entrega por ID
+ *     tags:
+ *       - Delivery
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID da entrega
  */
 
 exports.get = async (req, res) => {
@@ -154,13 +153,13 @@ exports.get = async (req, res) => {
     res.status(201).json({ "status": 1, message: ['entrega encontrado com sucesso!'], data: { delivery: deliveryDB, invoice: invoiceDB } });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ "status": 0, error: 'erro ao efetuar a criação da entrega.' });
+    res.status(500).json({ "status": 0, error: 'erro ao efetuar a consulta da entrega.' });
   }
 };
 
 /**
  * @swagger
- * /v1/delivery:
+ * /v1/delivery/{id}:
  *   put:
  *     summary: Atualizar uma ordem de entrega
  *     tags: [Delivery]
@@ -177,39 +176,76 @@ exports.get = async (req, res) => {
 
 exports.put = async (req, res) => {
   try {
-    let validator = [];
-    const { remetente, destinatario, frete, invoice } = req.body;
+    let data = {}, validator = [];
+    const id = req.params.id;
+    const { remetente, destinatario, frete } = req.body;
 
+    if (typeof id === 'undefined') {
+      validator.push('id é um campo obrigatório.');
+    }
 
+    if (typeof remetente !== 'undefined') {
+      data.remetente = remetente;
+    }
+
+    if (typeof destinatario !== 'undefined') {
+      data.destinatario = destinatario;
+    }
+
+    if (typeof frete !== 'undefined') {
+      data.frete = frete;
+    }
+
+    if (validator.length) {
+      res.status(400).json({ "status": 0, message: validator });
+      return;
+    }
+
+    const delivery = await Delivery.update(data, {
+      where: { id: id }
+    });
+
+    if (delivery)
+      res.status(201).json({ "status": 1, message: ['entrega encontrado com sucesso!'] });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ "status": 0, error: 'erro ao efetuar a criação da entrega.' });
+    res.status(500).json({ "status": 0, error: 'erro ao efetuar a atualização da entrega.' });
   }
 };
 
 /**
  * @swagger
- * /v1/delivery:
+ * /v1/delivery/{id}:
  *   delete:
  *     summary: Deletar uma ordem de entrega
  *     tags: [Delivery]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/DeliveryCreate'
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID da entrega a ser excluída
  *     responses:
  *       200:
- *         description: Entrega criada com sucesso!
+ *         description: Entrega deletada com sucesso!
  */
 
 exports.delete = async (req, res) => {
   try {
-    let validator = [];
-    const { remetente, destinatario, frete, invoice } = req.body;
+    const id = req.params.id;
 
+    const invoice = await Invoice.destroy({
+      where: { delivery_id: id }
+    });
+
+    const delivery = await Delivery.destroy({
+      where: { id: id }
+    });
+
+    if (delivery || invoice)
+      res.status(201).json({ "status": 1, message: ['entrega deletada com sucesso!'] });
 
 
   } catch (error) {
