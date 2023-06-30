@@ -1,11 +1,11 @@
-FROM node:latest
+# Use a imagem base do Node.js
+FROM node:18.16.1
 
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-RUN npm install
+WORKDIR /www
 
 COPY . .
+
+RUN npm install     
 
 EXPOSE 3000
 
